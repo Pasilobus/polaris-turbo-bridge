@@ -1,0 +1,23 @@
+{
+  "name": "polaris-turbo-bridge",
+  "version": "0.0.1",
+  "description": "Make Shopify Polaris Web Components (<s-button>, <s-link>) navigate with Hotwire Turbo in Rails or any HTML-over-the-wire app.",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js",
+  "author": "Pasilobus <dev@pasilobus.com> (https://pasilobus.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pasilobus/polaris-turbo-bridge.git"
+  },
+  "keywords": [
+    "polaris",
+    "turbo",
+    "hotwire",
+    "rails",
+    "importmap",
+    "shadow-dom",
+    "web-components"
+  ]
+}
