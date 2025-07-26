@@ -46,7 +46,7 @@ Add it once in your HTML <head> (Rails layout or equivalent):
 #### Rails 8 + Import‑Map
 
 ```bash
-bin/importmap pin polaris-turbo-bridge@1           # the bridge
+bin/importmap pin polaris-turbo-bridge@0        # the bridge
 ```
 
 ```js
