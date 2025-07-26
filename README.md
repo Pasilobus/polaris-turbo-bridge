@@ -1,6 +1,6 @@
 # Polaris‑Turbo‑Bridge
 
-> Let every [`<s-button>`](https://polaris.shopify.com/components/s-button) and [`<s-link>`](https://polaris.shopify.com/components/s-link) from **@shopify/polaris** behave like a first‑class Hotwire **Turbo Drive** link.
+> Let every [`<s-button>`](https://shopify.dev/docs/api/app-home/polaris-web-components/actions/button) and [`<s-link>`](https://shopify.dev/docs/api/app-home/polaris-web-components/actions/link) from **@shopify/polaris** behave like a first‑class Hotwire **Turbo Drive** link.
 
 *Zero dependencies, <2 kB minified, works with Import‑Map, esbuild, Vite, Webpacker.*
 
