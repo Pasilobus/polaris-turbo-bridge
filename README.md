@@ -6,7 +6,7 @@
 
 ---
 
-## Why?
+## Why?
 
 Polaris Web Components render their own `<a>` tag inside **Shadow DOM**.  
 Turbo Drive’s global click listener never “sees” that anchor, so navigation is blocked.  
@@ -26,7 +26,7 @@ delegates to `Turbo.visit()` (or a hidden form for REST verbs).
 
 ---
 
-## Install
+## Install
 
 ### 1 · Load the Polaris Web Component bundle
 
@@ -41,9 +41,9 @@ Add it once in your HTML <head> (Rails layout or equivalent):
 </head>
 ```
 
-### 2 · Pin and start the Turbo bridge
+### 2 · Pin and start the Turbo bridge
 
-#### Rails 8 + Import‑Map
+#### Rails 8 + Import‑Map
 
 ```bash
 bin/importmap pin polaris-turbo-bridge@0        # the bridge
@@ -57,7 +57,7 @@ import { PolarisTurboBridge } from "polaris-turbo-bridge";
 PolarisTurboBridge();
 ```
 
-#### npm / pnpm / yarn
+#### npm / pnpm / yarn
 
 ```bash
 npm i polaris-turbo-bridge
@@ -70,7 +70,7 @@ PolarisTurboBridge();
 
 ---
 
-## Features
+## Features
 
 * **GET navigation** via `Turbo.visit()`  
 * **`data-turbo-method`** (`delete`, `patch`, etc.) via hidden form with CSRF token  
@@ -81,9 +81,9 @@ PolarisTurboBridge();
 
 ---
 
-## API
+##  PI
 
-### `PolarisTurboBridge()`
+### `PolarisTurboBridge()`
 
 Initialises the global click listener. Call once after Turbo has loaded.  
 Set `window.POLARIS_TURBO_AUTOSTART = true` **before** the script tag if you
@@ -91,7 +91,7 @@ want the bridge to start automatically.
 
 ---
 
-## Contributing
+## Contributing
 
 1. `pnpm i`
 2. `pnpm test` (coming soon)
@@ -99,6 +99,6 @@ want the bridge to start automatically.
 
 ---
 
-## License
+## License
 
 MIT © 2025 — see [LICENSE](./LICENSE)
