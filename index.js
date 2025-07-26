@@ -1,12 +1,24 @@
-// Polaris Turbo Bridge — v.0.0.1
-// Lets <s-button> and <s-link> Shadow‑DOM elements from @shopify/polaris
-// behave like normal Turbo Drive links in HTML‑over‑the‑wire apps.
+// Polaris Turbo Bridge — v0.0.3
+// Lets <s-button> and <s-link> Shadow‑DOM elements work with Turbo
+// and neutralises Shopify App‑Bridge auto‑redirects.
 //
-// Zero dependencies. Works with Rails Import‑Map, esbuild, Vite, etc.
+// Zero deps – usable with Import‑Map, esbuild, Vite, etc.
 
+/* ---------- small helpers --------------------------------------- */
 function csrfToken() {
-  return document
-    .querySelector("meta[name='csrf-token']")?.getAttribute("content") || "";
+  return (
+    document.querySelector("meta[name='csrf-token']")?.getAttribute("content") ||
+    ""
+  );
+}
+
+function ensureNoAppRedirect(el) {
+  if (
+    el.getAttribute("data-turbo") !== "false" &&            // Turbo allowed
+    !el.hasAttribute("data-app-redirect")                   // not set yet
+  ) {
+    el.setAttribute("data-app-redirect", "false");          // stop App‑Bridge
+  }
 }
 
 function submitViaForm(url, method) {
@@ -36,6 +48,28 @@ function submitViaForm(url, method) {
 }
 
 export function PolarisTurboBridge() {
+  document
+    .querySelectorAll("s-button[href]:not([data-app-redirect]), s-link[href]:not([data-app-redirect])")
+    .forEach(ensureNoAppRedirect);
+
+  const mo = new MutationObserver((muts) => {
+    muts.forEach((m) => {
+      m.addedNodes.forEach((node) => {
+        if (
+          node instanceof Element &&
+          (node.matches("s-button[href]") || node.matches("s-link[href]"))
+        ) {
+          ensureNoAppRedirect(node);
+        } else if (node.querySelectorAll) {
+          node
+            .querySelectorAll("s-button[href], s-link[href]")
+            .forEach(ensureNoAppRedirect);
+        }
+      });
+    });
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+
   document.addEventListener(
     "click",
     (event) => {
@@ -48,36 +82,35 @@ export function PolarisTurboBridge() {
         event.ctrlKey ||
         event.shiftKey ||
         el.getAttribute("target") === "_blank"
-      ) return;
+      )
+        return;
 
       event.preventDefault();
 
-      const url         = el.getAttribute("href");
-      const method      = (el.dataset.turboMethod || "get").toLowerCase();
-      const frame       = el.dataset.turboFrame;
+      const url = el.getAttribute("href");
+      const method = (el.dataset.turboMethod || "get").toLowerCase();
+      const frame = el.dataset.turboFrame;
       const confirmText = el.dataset.turboConfirm;
 
       if (confirmText && !confirm(confirmText)) return;
 
       if (method === "get") {
-        // Requires @hotwired/turbo-rails or turbo.js already loaded
         Turbo.visit(url, { frame });
       } else {
         submitViaForm(url, method);
       }
     },
-    true // capture phase (before Polaris stops propagation)
+    true // capture phase (runs before Polaris stops propagation)
   );
 }
 
-// Auto‑start if the flag is set ──────────────────────────────────────────
 if (typeof window !== "undefined" && window.POLARIS_TURBO_AUTOSTART) {
   if (typeof window.Turbo !== "undefined") {
-    PolarisTurboBridge();                // ✅ Turbo present → start
+    PolarisTurboBridge();
   } else {
     console.warn(
-      "[polaris‑turbo‑bridge] POLARIS_TURBO_AUTOSTART is true, " +
-        "but Turbo is not loaded. Bridge disabled."
+      "[polaris-turbo-bridge] POLARIS_TURBO_AUTOSTART is true, " +
+        "but Turbo is not loaded; bridge disabled."
     );
   }
 }
