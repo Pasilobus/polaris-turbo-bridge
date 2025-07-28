@@ -1,10 +1,9 @@
-// Polaris Turbo Bridge — v0.0.3
+// Polaris Turbo Bridge — v0.0.6
 // Lets <s-button> and <s-link> Shadow‑DOM elements work with Turbo
 // and neutralises Shopify App‑Bridge auto‑redirects.
 //
 // Zero deps – usable with Import‑Map, esbuild, Vite, etc.
 
-/* ---------- small helpers --------------------------------------- */
 function csrfToken() {
   return (
     document.querySelector("meta[name='csrf-token']")?.getAttribute("content") ||
@@ -12,12 +11,23 @@ function csrfToken() {
   );
 }
 
-function ensureNoAppRedirect(el) {
+function markNoAppRedirect(el) {
+  // 1 · on the host element
   if (
-    el.getAttribute("data-turbo") !== "false" &&            // Turbo allowed
-    !el.hasAttribute("data-app-redirect")                   // not set yet
+    el.getAttribute("data-turbo") !== "false" &&
+    !el.hasAttribute("data-app-redirect")
   ) {
-    el.setAttribute("data-app-redirect", "false");          // stop App‑Bridge
+    el.setAttribute("data-app-redirect", "false");
+  }
+
+  // 2 · inside the shadow anchor (App‑Bridge looks there)
+  const anchor = el.shadowRoot?.querySelector("a[href]");
+  if (
+    anchor &&
+    anchor.getAttribute("data-turbo") !== "false" &&
+    !anchor.hasAttribute("data-app-redirect")
+  ) {
+    anchor.setAttribute("data-app-redirect", "false");
   }
 }
 
@@ -48,22 +58,19 @@ function submitViaForm(url, method) {
 }
 
 export function PolarisTurboBridge() {
-  document
-    .querySelectorAll("s-button[href]:not([data-app-redirect]), s-link[href]:not([data-app-redirect])")
-    .forEach(ensureNoAppRedirect);
+  const scan = (root) =>
+    root
+      .querySelectorAll("s-button[href], s-link[href], s-clickable[href]")
+      .forEach(markNoAppRedirect);
+
+  scan(document); // initial DOM
 
   const mo = new MutationObserver((muts) => {
     muts.forEach((m) => {
       m.addedNodes.forEach((node) => {
-        if (
-          node instanceof Element &&
-          (node.matches("s-button[href]") || node.matches("s-link[href]"))
-        ) {
-          ensureNoAppRedirect(node);
-        } else if (node.querySelectorAll) {
-          node
-            .querySelectorAll("s-button[href], s-link[href]")
-            .forEach(ensureNoAppRedirect);
+        if (node instanceof Element) {
+          if (node.matches("s-button[href], s-link[href], s-clickable[href]")) markNoAppRedirect(node);
+          scan(node); // nested
         }
       });
     });
@@ -73,10 +80,16 @@ export function PolarisTurboBridge() {
   document.addEventListener(
     "click",
     (event) => {
-      const el = event.target.closest("s-button[href], s-link[href]");
+      const el = event.target.closest("s-button[href], s-link[href], s-clickable[href]");
       if (!el) return;
 
-      // Respect modifier keys and external targets
+      // Skip if already loading
+      if (el.getAttribute('loading') === 'true') {
+        event.preventDefault();
+        return;
+      }
+
+      // Respect modifier keys / new‑tab
       if (
         event.metaKey ||
         event.ctrlKey ||
@@ -85,7 +98,12 @@ export function PolarisTurboBridge() {
       )
         return;
 
+      // Check if already handled
+      if (event.defaultPrevented) return;
+      
+      // Mark as handled
       event.preventDefault();
+      event.stopImmediatePropagation(); // <- stop App‑Bridge listeners
 
       const url = el.getAttribute("href");
       const method = (el.dataset.turboMethod || "get").toLowerCase();
@@ -94,13 +112,36 @@ export function PolarisTurboBridge() {
 
       if (confirmText && !confirm(confirmText)) return;
 
-      if (method === "get") {
-        Turbo.visit(url, { frame });
+      // Check element type
+      const tagName = el.tagName.toLowerCase();
+      const isLink = tagName === 's-link';
+      const needsLoading = (tagName === 's-button' || tagName === 's-clickable') && !frame;
+
+      if (needsLoading) {
+        // For buttons and clickables: show loading state with delay
+        el.setAttribute('loading', 'true');
+        
+        // Force browser to render the loading state
+        void el.offsetHeight;
+        
+        // Small delay to ensure loading spinner is visible
+        setTimeout(() => {
+          if (method === "get") {
+            Turbo.visit(url, { frame });
+          } else {
+            submitViaForm(url, method);
+          }
+        }, 100);
       } else {
-        submitViaForm(url, method);
+        // For links and frame navigations: go immediately
+        if (method === "get") {
+          Turbo.visit(url, { frame });
+        } else {
+          submitViaForm(url, method);
+        }
       }
     },
-    true // capture phase (runs before Polaris stops propagation)
+    true
   );
 }
 
