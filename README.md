@@ -28,7 +28,7 @@ delegates to `Turbo.visit()` (or a hidden form for REST verbs).
 
 ## Install
 
-### 1 · Load the Polaris Web Component bundle
+### 1 · Load the Polaris Web Component bundle
 
 Polaris Web Components are distributed only as a pre‑built script.
 Add it once in your HTML <head> (Rails layout or equivalent):
@@ -81,7 +81,7 @@ PolarisTurboBridge();
 
 ---
 
-##  PI
+## PI
 
 ### `PolarisTurboBridge()`
 
