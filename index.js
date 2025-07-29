@@ -1,4 +1,4 @@
-// Polaris Turbo Bridge — v0.0.6
+// Polaris Turbo Bridge — v0.0.7
 // Lets <s-button> and <s-link> Shadow‑DOM elements work with Turbo
 // and neutralises Shopify App‑Bridge auto‑redirects.
 //
@@ -89,12 +89,24 @@ export function PolarisTurboBridge() {
         return;
       }
 
-      // Respect modifier keys / new‑tab
+      const url = el.getAttribute("href");
+      const target = el.getAttribute("target");
+
+      // Handle _blank and _top with open
+      if (target === "_blank" || target === "_top") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        open(url, target);
+        return;
+      }
+
+      // Respect modifier keys / other targets
       if (
         event.metaKey ||
         event.ctrlKey ||
         event.shiftKey ||
-        el.getAttribute("target") === "_blank"
+        target === "_parent" ||
+        target === "_self"
       )
         return;
 
@@ -105,7 +117,6 @@ export function PolarisTurboBridge() {
       event.preventDefault();
       event.stopImmediatePropagation(); // <- stop App‑Bridge listeners
 
-      const url = el.getAttribute("href");
       const method = (el.dataset.turboMethod || "get").toLowerCase();
       const frame = el.dataset.turboFrame;
       const confirmText = el.dataset.turboConfirm;
