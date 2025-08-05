@@ -83,13 +83,27 @@ PolarisTurboBridge();
 
 ---
 
-## PI
+## API
 
-### `PolarisTurboBridge()`
+### `PolarisTurboBridge(options)`
 
 Initialises the global click listener. Call once after Turbo has loaded.  
 Set `window.POLARIS_TURBO_AUTOSTART = true` **before** the script tag if you
 want the bridge to start automatically.
+
+#### Options (optional)
+
+Hide the body during navigation to prevent layout shift:
+
+```js
+PolarisTurboBridge({
+  hideBodyOnNavigation: true,
+  bodyHideClass: 'hidden',
+  pageSelector: 's-page'
+});
+```
+
+This will add the `hidden` class to `<s-page>` elements during navigation.
 
 ---
 
