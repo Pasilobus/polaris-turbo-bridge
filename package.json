@@ -1,6 +1,6 @@
 {
   "name": "polaris-turbo-bridge",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Make Shopify Polaris Web Components (<s-button>, <s-link>) navigate with Hotwire Turbo in Rails or any HTML-over-the-wire app.",
   "type": "module",
   "main": "index.js",
