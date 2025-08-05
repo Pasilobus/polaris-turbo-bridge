@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2025-08-05
+
+### Changed
+- Version bump to 0.1.0 for better semantic versioning
+
 ## [0.0.9] - 2025-08-05
 
 ### Added
