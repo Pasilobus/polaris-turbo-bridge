@@ -1,4 +1,3 @@
-
 // Polaris Turbo Bridge — v0.0.9
 // Lets <s-button> and <s-link> Shadow‑DOM elements work with Turbo
 // and neutralises Shopify App‑Bridge auto‑redirects.
@@ -121,19 +120,6 @@ export function PolarisTurboBridge(options = {}) {
       // If Shopify App Bridge is available, show global loading state
       if (typeof window.shopify !== 'undefined' && window.shopify.loading) {
         window.shopify.loading(true);
-      }
-
-      // Check if this is a delete form (either method="delete" or has _method=DELETE input)
-      const formMethod = form.method.toLowerCase();
-      const hasDeleteMethodInput = form.querySelector('input[name="_method"][value="DELETE"]');
-      const isDeleteForm = formMethod === 'delete' || hasDeleteMethodInput || form.hasAttribute('data-turbo-confirm');
-
-      // Optionally hide body on form submission if it's a GET request and NOT a delete
-      if (config.hideBodyOnNavigation && formMethod === 'get' && !isDeleteForm) {
-        const pageElement = document.body.querySelector(config.pageSelector);
-        if (pageElement) {
-          pageElement.classList.add(config.bodyHideClass);
-        }
       }
     },
     true
