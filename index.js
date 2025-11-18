@@ -1,4 +1,4 @@
-// Polaris Turbo Bridge — v0.0.9
+// Polaris Turbo Bridge — v0.2.0
 // Lets <s-button> and <s-link> Shadow‑DOM elements work with Turbo
 // and neutralises Shopify App‑Bridge auto‑redirects.
 //
